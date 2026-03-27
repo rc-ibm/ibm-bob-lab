@@ -42,4 +42,11 @@ gradle war
 
 
 ### Code Review
-When reviewing code or executing security scans, check for compliance based on the OSCAL files inside the [`./im8`](./im8) directory. Always include the title of IM8 policy violated in the Bob Findings if posisble e.g. "LM-19: Log Sanitisation Violation - Password logging in plain text"
+When reviewing code or executing security scans, always identify all security issues, categorize them by type (OWASP Top 10, CWE), and rank them by severity (Critical, High, Medium, Low).
+
+For each vulnerability found, provide:
+1. Location (file and line number)
+2. Vulnerability type and category
+3. Description of the security risk
+4. Potential attack scenario
+5. Severity rating with justification

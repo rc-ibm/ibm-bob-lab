@@ -1,18 +1,6 @@
 /**
- This application is for demonstration use only. It contains known application security
-vulnerabilities that were created expressly for demonstrating the functionality of
-application security testing tools. These vulnerabilities may present risks to the
-technical environment in which the application is installed. You must delete and
-uninstall this demonstration application upon completion of the demonstration for
-which it is intended. 
-
-IBM DISCLAIMS ALL LIABILITY OF ANY KIND RESULTING FROM YOUR USE OF THE APPLICATION
-OR YOUR FAILURE TO DELETE THE APPLICATION FROM YOUR ENVIRONMENT UPON COMPLETION OF
-A DEMONSTRATION. IT IS YOUR RESPONSIBILITY TO DETERMINE IF THE PROGRAM IS APPROPRIATE
-OR SAFE FOR YOUR TECHNICAL ENVIRONMENT. NEVER INSTALL THE APPLICATION IN A PRODUCTION
-ENVIRONMENT. YOU ACKNOWLEDGE AND ACCEPT ALL RISKS ASSOCIATED WITH THE USE OF THE APPLICATION.
-
 IBM AltoroJ
+See NOTICE file for license and attribution details.
 (c) Copyright IBM Corp. 2008, 2013 All Rights Reserved.
  */
 
@@ -216,7 +204,7 @@ public class DBUtil {
 		Connection connection = getConnection();
 		Statement statement = connection.createStatement();
 		
-		ResultSet resultSet =statement.executeQuery("SELECT COUNT(*)FROM PEOPLE WHERE USER_ID = '"+ user +"' AND PASSWORD='" + password + "'"); /* BAD - user input should always be sanitized */
+		ResultSet resultSet =statement.executeQuery("SELECT COUNT(*)FROM PEOPLE WHERE USER_ID = '"+ user +"' AND PASSWORD='" + password + "'");
 		
 		if (resultSet.next()){
 			
@@ -239,7 +227,7 @@ public class DBUtil {
 		
 		Connection connection = getConnection();
 		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = '"+ username +"' "); /* BAD - user input should always be sanitized */
+		ResultSet resultSet =statement.executeQuery("SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = '"+ username +"' ");
 
 		String firstName = null;
 		String lastName = null;
@@ -273,7 +261,7 @@ public class DBUtil {
 		
 		Connection connection = getConnection();
 		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_ID, ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE USERID = '"+ username +"' "); /* BAD - user input should always be sanitized */
+		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_ID, ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE USERID = '"+ username +"' ");
 
 		ArrayList<Account> accounts = new ArrayList<Account>(3);
 		while (resultSet.next()){
@@ -448,7 +436,7 @@ public class DBUtil {
 
 		Connection connection = getConnection();
 		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE ACCOUNT_ID = "+ accountNo +" "); /* BAD - user input should always be sanitized */
+		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE ACCOUNT_ID = "+ accountNo +" ");
 
 		ArrayList<Account> accounts = new ArrayList<Account>(3);
 		while (resultSet.next()){

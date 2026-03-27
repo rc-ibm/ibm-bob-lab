@@ -1,0 +1,36 @@
+This project includes code derived from IBM AltoroJ.
+
+Original work:
+IBM AltoroJ
+(c) Copyright IBM Corp. 2008, 2013 All Rights Reserved.
+
+The original software included the following notice:
+
+"""This application is for demonstration use only. It contains known application security
+vulnerabilities that were created expressly for demonstrating the functionality of
+application security testing tools. These vulnerabilities may present risks to the
+technical environment in which the application is installed. You must delete and
+uninstall this demonstration application upon completion of the demonstration for
+which it is intended. 
+
+IBM DISCLAIMS ALL LIABILITY OF ANY KIND RESULTING FROM YOUR USE OF THE APPLICATION
+OR YOUR FAILURE TO DELETE THE APPLICATION FROM YOUR ENVIRONMENT UPON COMPLETION OF
+A DEMONSTRATION. IT IS YOUR RESPONSIBILITY TO DETERMINE IF THE PROGRAM IS APPROPRIATE
+OR SAFE FOR YOUR TECHNICAL ENVIRONMENT. NEVER INSTALL THE APPLICATION IN A PRODUCTION
+ENVIRONMENT. YOU ACKNOWLEDGE AND ACCEPT ALL RISKS ASSOCIATED WITH THE USE OF THE APPLICATION.
+
+IBM AltoroJ
+(c) Copyright IBM Corp. 2008, 2013 All Rights Reserved."""
+
+Modifications:
+This version has been modified from the original AltoroJ project.
+
+Changes include (but are not limited to):
+
+* Removal of intentionally insecure comments
+* Adaptation for Bob lab
+
+Modifications by: IBM Client Engineering Singapore
+Year: 2026
+
+This project is not the original IBM AltoroJ application.

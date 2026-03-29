@@ -25,4 +25,4 @@
 ### Build Artifacts
 - WAR excludes compiled classes and libs (lines 41-42 in build.gradle)
 - Server's lib folder must contain dependencies (not bundled in WAR)
-- Source compatibility locked to Java 1.7 (line 5-6 in build.gradle)
+- Source compatibility locked to Java 1.8 (line 5-6 in build.gradle)

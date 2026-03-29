@@ -16,7 +16,7 @@
 ### Build & Deployment Architecture
 - WAR intentionally excludes compiled classes and libs (build.gradle:41-42)
 - Dependencies must exist in Tomcat's lib folder (not self-contained WAR)
-- Java 1.7 compatibility enforced (cannot use Java 8+ features)
+- Java 1.8 compatibility enforced
 
 ### REST API Architecture
 - Swagger config modified programmatically at startup (not static)

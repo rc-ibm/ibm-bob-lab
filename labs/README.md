@@ -19,11 +19,11 @@ Learn how IBM Bob can analyze complex codebases, generate architecture documenta
 ### ☕ [Part 2: Java Application Modernization](./PART2_JAVA_MODERNIZATION.md)
 **Estimated Time: 5-10 minutes**
 
-Discover how IBM Bob's agentic modernization workflow can autonomously upgrade Java applications from Java 1.7 to Java 21, handling complex refactoring tasks with validation and self-correction.
+Discover how IBM Bob's agentic modernization workflow can autonomously upgrade Java applications from Java 8 to Java 21, handling complex refactoring tasks with validation and self-correction.
 
 **Key Topics:**
 - Agentic modernization workflow (autonomous AI-driven upgrades)
-- Java 1.7 → Java 21 LTS upgrade strategy
+- Java 8 → Java 21 LTS upgrade strategy
 - Gradle wrapper and dependency modernization
 - Iterative refactoring with automated validation
 - Self-healing capabilities for detected issues

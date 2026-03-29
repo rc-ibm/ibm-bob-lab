@@ -241,4 +241,4 @@ Bob will analyze the diagram syntax and correct any issues such as:
 After completing this lab:
 
 **Proceed to Part 2**: [Java Modernization](./PART2_JAVA_MODERNIZATION.md)
-- Modernize the codebase from Java version 1.7 to 21 through an agentic workflow
+- Modernize the codebase from Java version 8 to 21 through an agentic workflow

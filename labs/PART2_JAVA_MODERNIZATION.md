@@ -1,5 +1,5 @@
 # IBM Bob Workshop - Java Application Modernization | Part 2
-## Case Study: AltoroJ Banking Application Upgrade (Java 1.7 → Java 21)
+## Case Study: AltoroJ Banking Application Upgrade (Java 8 → Java 21)
 
 ### Audience
 Software engineers, DevOps engineers, platform architects, and modernization specialists
@@ -12,7 +12,7 @@ Demonstrate how **IBM Bob** can:
 - Update build configurations, dependencies, and runtime environments
 - Validate modernization through automated testing
 
-We will use **IBM Bob's agentic modernization workflow** to upgrade the AltoroJ Banking Application from Java 1.7 to Java 21, leveraging Bob's autonomous capabilities to handle complex refactoring tasks.
+We will use **IBM Bob's agentic modernization workflow** to upgrade the AltoroJ Banking Application from Java 8 to Java 21, leveraging Bob's autonomous capabilities to handle complex refactoring tasks.
 
 ---
 
@@ -68,13 +68,13 @@ To kickstart the workflow, you can either click on the start button for the `Jav
 In this phase, Bob analyzes the AltoroJ application to understand its current state and identify modernization requirements.
 
 ### What Bob Does:
-- Examines build.gradle to identify current Java version (1.7)
+- Examines build.gradle to identify current Java version (8)
 - Checks Gradle wrapper version compatibility
 - Analyzes dependencies for deprecated configurations
 - Identifies required changes for Java 21 compatibility
 
 ### Key Findings:
-- **Current Java Version**: 1.7 (very outdated)
+- **Current Java Version**: 8 (very outdated)
 - **Target Java Version**: 21 (LTS)
 - **Gradle Version**: 6.9.4 (needs upgrade for Java 21 support)
 - **Deprecated Configurations**: `compile`, `providedCompile`, `archiveName`
@@ -88,8 +88,8 @@ Bob autonomously performs the modernization in an iterative manner, validating e
 ### Step 1: Update Java Compatibility
 
 **What Bob Does:**
-- Updates `sourceCompatibility` from "1.7" to "21"
-- Updates `targetCompatibility` from "1.7" to "21"
+- Updates `sourceCompatibility` from "8" to "21"
+- Updates `targetCompatibility` from "8" to "21"
 - Validates the change by reading the file back
 
 ### Step 2: Upgrade Gradle Wrapper
@@ -140,10 +140,10 @@ Bob validates the modernization by building the application.
 
 ### 1. Gradle Configuration
 
-**Before (Java 1.7):**
+**Before (Java 8):**
 ```gradle
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+sourceCompatibility = "8"
+targetCompatibility = "8"
 
 dependencies {
     compile <>
@@ -261,7 +261,7 @@ Bob understands:
 By the end of this lab, you should have:
 
 1. **Modernized Application**
-   - Java 21 compatibility (upgraded from Java 1.7)
+   - Java 21 compatibility (upgraded from Java 8)
    - Gradle 8.5 (upgraded from 6.9.4)
    - Modern Gradle dependency configurations
    - Successfully building WAR file
@@ -309,7 +309,7 @@ This lab demonstrates IBM Bob's agentic modernization capabilities for Java vers
 - Developer oversight is maintained throughout
 
 **Modernization Achieved:**
-- ✅ Java 1.7 → Java 21 LTS upgrade
+- ✅ Java 8 → Java 21 LTS upgrade
 - ✅ Gradle 6.9.4 → Gradle 8.5 upgrade
 - ✅ Deprecated Gradle configurations modernized
 - ✅ Successful build validation with Java 21

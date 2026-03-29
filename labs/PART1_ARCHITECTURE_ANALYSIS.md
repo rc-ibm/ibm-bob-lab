@@ -52,26 +52,9 @@ This step shows that IBM Bob can perform a **deep technical read** of banking so
 Can you describe what this software is doing? In addition, can you show me the software architecture - a Mermaid diagram will be a good start.
 ```
 
-#### Enhanced Prompt (use Bob's magic star to generate something similar):
+#### Enhanced Prompt (use Bob's magic star - to the left of the Send button - to generate something similar):
 ```
-Analyze the AltoroMutual Online Banking codebase and provide a comprehensive explanation of its functionality, including:
-
-1. **Application Architecture**: How the Java Servlet-based backend handles web requests, session management, and the dual interface (web UI + REST API)
-2. **Authentication & Authorization**: How LoginServlet and the authentication filters (AuthFilter, AdminFilter, ApiAuthFilter) work together to secure the application
-3. **Role-Based Access Control**: How regular users and administrators differ in their permissions and capabilities
-4. **Transaction Processing**: The transfer logic in TransferServlet and TransferAPI including balance verification, transaction recording, and the debit/credit pattern
-5. **Data Model**: The relationship between User, Account, Transaction, and Feedback entities, and how DBUtil manages database operations
-6. **REST API**: How the JAX-RS API (AltoroAPI) exposes banking operations and differs from the servlet-based web interface
-7. **Database Initialization**: How StartupListener initializes the Derby database and the app.properties configuration system
-
-Additionally, create detailed Mermaid diagrams showing:
-- System architecture with all components (servlets, filters, API, database)
-- Request flow for both web UI and REST API
-- Authentication and authorization flow
-- Transaction processing sequence
-- Data model relationships (ER diagram)
-
-Clearly state key invariants, business rules, and assumptions made by the code.
+Analyze the provided software and deliver a comprehensive explanation of its functionality, purpose, and operational behavior. Detail what problems it solves, how it processes data, what its key features are, and how different components interact during execution. Then create a detailed Mermaid diagram illustrating the software architecture, including all major components, modules, classes, services, data flows, dependencies, and their relationships. The diagram should clearly show the system's structure, layer separation if applicable, external integrations, data storage mechanisms, and communication patterns between components. Ensure the Mermaid syntax is correct and the diagram is sufficiently detailed to understand the complete architectural design at both high-level and component-level perspectives.
 ```
 
 ---
@@ -91,12 +74,7 @@ Based on your analysis, create a comprehensive ARCHITECTURE.md document that inc
 
 1. **Executive Summary**: One-paragraph overview of the AltoroMutual system
 2. **System Architecture**: High-level Mermaid diagram showing all components (web layer, API layer, business logic, data layer)
-3. **Component Descriptions**: Detailed explanation of each module:
-   - Servlet layer (LoginServlet, AccountViewServlet, TransferServlet, AdminServlet, FeedbackServlet)
-   - REST API layer (LoginAPI, AccountAPI, TransferAPI, AdminAPI, FeedbackAPI)
-   - Security filters (AuthFilter, AdminFilter, ApiAuthFilter)
-   - Data models (User, Account, Transaction, Feedback)
-   - Utilities (DBUtil, ServletUtil, OperationsUtil)
+3. **Component Descriptions**: Detailed explanation of each module
 4. **API Reference**: All REST endpoints with their purposes, parameters, and access controls
 5. **Servlet Reference**: All servlet endpoints with their purposes and access controls
 6. **Data Model**: Entity-relationship diagram using Mermaid showing User, Account, Transaction, and Feedback relationships
@@ -144,6 +122,8 @@ Include Mermaid flowcharts showing:
 - Complete data pipeline from API request to persisted transaction (REST API path)
 - Session lifecycle and authentication flow
 - Transaction processing with error handling branches
+
+Save this as DATA_PIPELINE_ANALYSIS.md in the current directory
 ```
 
 ---
@@ -185,46 +165,6 @@ Format this as a structured requirements document with clear acceptance criteria
 
 ---
 
-## Step 5 - System Invariants and Assumptions
-
-### Why this step?
-Identifying invariants helps prevent bugs and guides future development.
-
-### Prompt
-```
-Identify and document all system invariants and assumptions:
-
-1. **Data Invariants**: Rules that must always hold true in the database
-   - Account balance integrity
-   - Transaction record completeness
-   - User-account relationships
-
-2. **Business Invariants**: Financial rules that cannot be violated
-   - Transfer amount validation
-   - Account ownership verification
-   - Transaction atomicity
-
-3. **Security Invariants**: Access control rules that must be enforced
-   - Authentication requirements
-   - Session validation
-   - Admin privilege checks
-   - API token validation
-
-4. **Technical Assumptions**: What the code assumes about its environment
-   - Derby database location and initialization (check StartupListener and AGENTS.md)
-   - Session storage and timeout
-   - app.properties configuration
-   - Servlet container capabilities
-
-For each invariant, explain:
-- What the invariant is
-- Where in the code it's enforced (specific classes and methods)
-- What could go wrong if violated
-- Any security implications
-```
-
----
-
 ## Expected Outcome
 
 By the end of this lab, you should have:
@@ -237,11 +177,27 @@ By the end of this lab, you should have:
    - Transaction flow sequence diagrams
    - Security model documentation (web + API authentication)
    - Functional requirements for users and administrators
-   - Data pipeline analysis (web UI and REST API paths)
    - System invariants and assumptions
    - Database initialization and configuration details
 
-2. A deep understanding of how IBM Bob can:
+2. A detailed **DATA_PIPELINE_ANALYSIS.md** document containing:
+   - Request lifecycle for web UI and REST API paths
+   - Transaction state management and flow
+   - Session management and authentication flow
+   - Error handling at each pipeline stage
+   - Data consistency guarantees
+   - Audit trail and compliance logging
+   - Database initialization process
+   - Mermaid flowcharts for complete data pipelines
+
+3. A comprehensive **FUNCTIONAL_REQUIREMENTS.md** document containing:
+   - User operations (web UI and API capabilities)
+   - Administrative operations and privileged functions
+   - Business rules (validation, constraints, transaction requirements)
+   - Security requirements (authentication, authorization, session management)
+   - Clear acceptance criteria for each requirement
+
+4. A deep understanding of how IBM Bob can:
    - Analyze complex Java-based financial codebases
    - Understand servlet-based web architectures
    - Document REST API implementations
@@ -251,6 +207,34 @@ By the end of this lab, you should have:
    - Identify critical system invariants
 
 ---
+
+---
+
+## Troubleshooting
+
+### Mermaid Diagram Issues
+
+If any Mermaid diagrams generated by Bob fail to render correctly or show syntax errors:
+
+1. **Select the problematic Mermaid diagram text** in the editor (the code block between the ` ```mermaid ` markers)
+2. **Add the selection to chat** using the "Chat" button, context menu ("Add To Context"), or keyboard shortcut (`ctrl/cmd+L`)
+3. **Ask Bob to fix it** with a prompt like:
+   ```
+   This Mermaid diagram has a syntax error. Can you fix it?
+   ```
+   or
+   ```
+   The diagram is not rendering correctly. Please correct the syntax.
+   ```
+
+Bob will analyze the diagram syntax and correct any issues such as:
+- Invalid node identifiers or special characters
+- Incorrect arrow syntax
+- Missing quotes around labels with spaces
+- Improper nesting or indentation
+- Unsupported Mermaid features
+
+**Tip**: You can also select and add specific diagrams to chat to ask Bob to regenerate them with different styles or levels of detail.
 
 ## Next Steps
 

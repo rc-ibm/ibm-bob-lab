@@ -38,7 +38,6 @@ gradle war
 
 ### No Test Framework
 - Project has no unit tests or test framework configured
-- Testing done manually or via security scanning tools (AppScan, etc.)
 
 
 ### Code Review

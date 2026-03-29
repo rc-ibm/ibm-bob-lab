@@ -29,5 +29,4 @@
 
 ### Testing Architecture
 - No unit test framework or test directory structure
-- Testing done via manual interaction or security scanning tools
 - No CI/CD pipeline or automated testing infrastructure

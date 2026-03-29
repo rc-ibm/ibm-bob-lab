@@ -76,7 +76,7 @@ public class DBUtil {
 			
 			try {
 				//load JDBC driver
-				Class.forName(DRIVER).newInstance();
+				Class.forName(DRIVER).getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
 				Log4AltoroJ.getInstance().logError(e.getMessage());
 				e.printStackTrace();

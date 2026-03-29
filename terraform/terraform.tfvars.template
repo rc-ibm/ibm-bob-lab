@@ -1,0 +1,53 @@
+##############################################################################
+# Terraform Variables Template
+# Copy this file to terraform.tfvars and fill in your values
+##############################################################################
+
+# IBM Cloud API Key (required)
+# Get your API key from: https://cloud.ibm.com/iam/apikeys
+ibmcloud_api_key = "YOUR_IBM_CLOUD_API_KEY"
+
+# Region where resources will be deployed
+region = "us-south"
+
+# Prefix for resource names
+prefix = "altoromutual"
+
+# Existing resource group name (optional)
+# If not specified, a new resource group will be created
+# resource_group_name = "default"
+
+# Container image reference
+# The image has already been pushed to this registry
+image_reference = "us.icr.io/cr-txv-pd337he2/altoromutual:latest"
+
+# Container registry server
+registry_server = "us.icr.io"
+
+# Registry email (used for authentication)
+registry_email = "iamapikey@ibm.com"
+
+# Application port
+app_port = 8080
+
+# Auto-scaling configuration
+scale_min_instances = 0  # 0 enables scale-to-zero
+scale_max_instances = 2
+
+# Resource limits per instance
+scale_cpu_limit               = "1"    # 1 vCPU
+scale_memory_limit            = "4G"   # 4GB memory
+scale_ephemeral_storage_limit = "400M"
+
+# Concurrency and timeout settings
+scale_concurrency     = 100  # Max concurrent requests per instance
+scale_request_timeout = 300  # Request timeout in seconds
+
+# Optional: Environment variables for the application
+# app_env_variables = [
+#   {
+#     type  = "literal"
+#     name  = "JAVA_OPTS"
+#     value = "-Xmx2g -Xms512m"
+#   }
+# ]

@@ -17,7 +17,7 @@ Learn how IBM Bob can analyze complex codebases, generate architecture documenta
 - Functional requirements extraction
 
 ### ☕ [Part 2: Java Application Modernization](./PART2_JAVA_MODERNIZATION.md)
-**Estimated Time: 5-10 minutes**
+**Estimated Time: 10-15 minutes**
 
 Discover how IBM Bob's agentic modernization workflow can autonomously upgrade Java applications from Java 8 to Java 21, handling complex refactoring tasks with validation and self-correction.
 
@@ -32,7 +32,7 @@ Discover how IBM Bob's agentic modernization workflow can autonomously upgrade J
 ### 🔒 [Part 3: Security Review & Remediation](./PART3_SECURITY_REVIEW.md)
 **Estimated Time: 15-20 minutes**
 
-Explore how IBM Bob can discover security vulnerabilities, generate compliance reports, and apply secure coding fixes aligned with OWASP and banking security standards.
+Explore how IBM Bob can discover security vulnerabilities, generate compliance reports, and apply secure coding fixes aligned with OWASP and security standards.
 
 **Key Topics:**
 - `/review` slash command for kickstart code review

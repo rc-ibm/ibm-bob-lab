@@ -30,7 +30,7 @@ We will audit the **AltoroJ Banking Application**, which contains intentional se
 5. Apply secure code fixes following Java security best practices
 6. Verify remediation effectiveness and compliance alignment
 
-Each step builds on the previous one and mirrors how security audits are conducted in real enterprise banking environments.
+Each step builds on the previous one and mirrors how security audits are conducted in real enterprise environments.
 
 ---
 
@@ -76,11 +76,7 @@ For more details, see the [Bob documentation on /review](https://bob.ibm.com/doc
 
 Since we've already committed our changes and want to review specific files for security issues, we'll use the `/review` command with a targeted approach:
 
-1. **Open Bob Chat**
-   - Click on the Bob icon in the VS Code sidebar
-   - Ensure you're in a mode that supports code review (Code, Advanced, or Ask mode)
-
-2. **Run the Security Review**
+1. **Run the Security Review**
    
    Type the following command in Bob chat:
    ```
@@ -99,7 +95,7 @@ Since we've already committed our changes and want to review specific files for 
      - Insecure session management
      - Input validation issues
 
-3. **Review Findings in Bob Findings Panel**
+2. **Review Findings in Bob Findings Panel**
    
    After the review completes, Bob will automatically populate the **Bob Findings panel** with discovered issues:
    - Click on the "Bob Findings" icon in the VS Code sidebar (or use the command palette: "Bob: Show Findings")
@@ -110,7 +106,7 @@ Since we've already committed our changes and want to review specific files for 
      - **Description** of the issue
      - **Suggested remediation** (when applicable)
    
-4. **Navigate to Issues**
+3. **Navigate to Issues**
    - Click on any finding in the panel to jump directly to the problematic code
    - Review the context and understand the security implication
    - Use the suggestions to plan your remediation strategy
@@ -123,16 +119,15 @@ The `/review` command performs comprehensive analysis including:
 - **Security Checks:** OWASP Top 10 vulnerabilities, injection flaws, authentication issues
 - **Performance Issues:** Inefficient algorithms, memory leaks, blocking operations
 - **Style Consistency:** Code formatting, naming conventions, best practices
-- **Compliance:** Checks against OSCAL policies defined in the `im8/` directory
+- **Compliance:** Checks for CWE/OWASP security vulnerabilities
 
 ### Expected Findings
 
 The Bob Findings panel should reveal vulnerabilities including:
 
-**LoginAPI.java:**
+**LoginServlet.java:**
 - Password converted to lowercase
-- Passwork logging in plain text SQL injection in authentication (CWE-89)
-- Weak authentication token generation
+- Passwork logging in plain text
 
 **DBUtil.java:**
 - SQL injection
@@ -261,13 +256,12 @@ If you need more control over the remediation or want to fix multiple issues tog
    When writing your task for Bob, include these key elements:
    - **Specific file path** using the `@` mention syntax (e.g., `@/src/com/ibm/security/appscan/altoromutual/util/DBUtil.java`)
    - **Vulnerability type** with CWE classification (e.g., SQL Injection, CWE-89)
-   - **Reference to Workspace Problems** using the `@problems` tag to help Bob understand the diagnostic context
    - **Desired fix approach** (e.g., use PreparedStatement)
    - **Additional requirements** (e.g., add comments, preserve functionality)
 
    **Example Task:**
    ```
-   Fix the SQL injection vulnerability in @/src/com/ibm/security/appscan/altoromutual/util/DBUtil.java identified in @problems.
+   Fix the SQL injection vulnerability in @/src/com/ibm/security/appscan/altoromutual/util/DBUtil.java.
    
    Replace all string concatenation in SQL queries with PreparedStatement to prevent SQL injection attacks. Specifically:
    
@@ -280,7 +274,6 @@ If you need more control over the remediation or want to fix multiple issues tog
    
    **Key Tips for Writing Effective Tasks:**
    - Use `@/path/to/file` to reference specific files - this helps Bob locate the exact file
-   - Use `@problems` to reference the Workspace Problems panel - this gives Bob context about diagnostics
    - Mention the specific vulnerability type (e.g., "SQL Injection", "CWE-89") for clarity
    - Be explicit about the desired outcome (e.g., "use PreparedStatement instead of string concatenation")
    - Request documentation (e.g., "add comments explaining the security improvement")
@@ -316,7 +309,7 @@ By the end of this lab, you should have:
 2. **Fixed SQL Injection** vulnerabilities in `DBUtil.java`
 
 3. Understanding of how IBM Bob can:
-   - Identify security vulnerabilities in Java banking applications
+   - Identify security vulnerabilities in Java applications
    - Categorize issues using industry standards (OWASP, CWE)
    - Generate compliance-ready documentation
    - Apply secure coding fixes following best practices

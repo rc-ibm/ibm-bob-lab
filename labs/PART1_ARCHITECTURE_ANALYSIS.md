@@ -6,7 +6,7 @@ Software engineers, solution architects, and developers
 
 ### Goal of the Workshop
 Demonstrate how **IBM Bob** can:
-- Understand complex banking system codebases
+- Understand complex system codebases
 - Analyze API architecture and data flows
 - Generate comprehensive engineering artifacts (diagrams, documentation)
 - Reason about transaction logic and data integrity
@@ -45,7 +45,7 @@ Before documenting, extending, or auditing financial software, engineers must **
 - Data integrity mechanisms
 - Business rules and constraints
 
-This step shows that IBM Bob can perform a **deep technical read** of banking software, not just summarize files.
+This step shows that IBM Bob can perform a **deep technical read** of software, not just summarize files.
 
 ### Prompt
 ```
@@ -205,8 +205,6 @@ By the end of this lab, you should have:
    - Create accurate technical diagrams
    - Extract business requirements from code
    - Identify critical system invariants
-
----
 
 ---
 

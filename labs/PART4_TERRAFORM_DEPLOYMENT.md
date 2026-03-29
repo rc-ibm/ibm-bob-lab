@@ -19,6 +19,11 @@ We will deploy the **AltoroMutual Banking Application** to IBM Cloud Code Engine
 >
 > You will use Bob's **Terraform IBM Modules MCP** integration to generate and manage Terraform configurations for IBM Cloud deployments.
 
+### Bob IDE Mode
+> **Required Mode:** `Advanced`
+>
+> Ensure you are in **Advanced Mode** before starting this lab. This mode enables MCP usage.
+
 ---
 
 ## Workshop Flow Overview
@@ -266,21 +271,9 @@ Terraform uses variables to make configurations reusable and secure. You need to
 
 ### Instructions
 
-1. **Obtain IBM Cloud API Key** (will be provided by instructor)
+1. **Obtain IBM Cloud API Key** 
    
-   If you don't have an API key:
-   
-   a. Log in to [IBM Cloud Console](https://cloud.ibm.com)
-   
-   b. Navigate to **Manage** → **Access (IAM)** → **API keys**
-   
-   c. Click **Create an IBM Cloud API key**
-   
-   d. Provide a name (e.g., "terraform-deployment")
-   
-   e. Click **Create** and copy the API key
-   
-   f. **Important**: Store this key securely - you won't be able to see it again
+   This will be provided by your instructor.
 
 2. **Create Configuration File**
    
@@ -293,6 +286,10 @@ Terraform uses variables to make configurations reusable and secure. You need to
    
    Open [`terraform.tfvars`](../terraform/terraform.tfvars) and configure:
    
+   - `ibmcloud_api_key`: provided by instructor
+   - `resource_group`: `txv-itz-69c2a8a4be4b611aff7968` (uncommented)
+   - `prefix`: ensure prefix is unique so that you do not have clashing projects with your labmates
+   
    ```hcl
    # IBM Cloud API Key (required)
    ibmcloud_api_key = "YOUR_IBM_CLOUD_API_KEY"
@@ -301,9 +298,9 @@ Terraform uses variables to make configurations reusable and secure. You need to
    region = "us-south"
    
    # Existing resource group name
-   # resource_group = "txv-itz-69c2a8a4be4b611aff7968"
+   resource_group = "txv-itz-69c2a8a4be4b611aff7968"
    
-   # Prefix for resource names (unique)
+   # Prefix for resource names (must be unique)
    prefix = "altoromutual-<YOUR_INITIALS>"
    
    # Container image reference

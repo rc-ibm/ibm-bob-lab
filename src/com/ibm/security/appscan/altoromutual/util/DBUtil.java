@@ -8,6 +8,7 @@ package com.ibm.security.appscan.altoromutual.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -161,17 +162,26 @@ public class DBUtil {
 	public static ArrayList<Feedback> getFeedback (long feedbackId){
 		ArrayList<Feedback> feedbackList = new ArrayList<Feedback>();
 		
-		try { 
+		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
 			
+			/*
+			 * SECURITY FIX: Using PreparedStatement with parameterized query to prevent SQL injection.
+			 * Previously used string concatenation which allowed malicious input to modify the SQL query.
+			 * PreparedStatement treats user input as data, not executable SQL code.
+			 */
 			String query = "SELECT * FROM FEEDBACK";
+			PreparedStatement preparedStatement;
 			
 			if (feedbackId != Feedback.FEEDBACK_ALL){
-				query = query + " WHERE FEEDBACK_ID = "+ feedbackId +"";
+				query = query + " WHERE FEEDBACK_ID = ?";
+				preparedStatement = connection.prepareStatement(query);
+				preparedStatement.setLong(1, feedbackId);
+			} else {
+				preparedStatement = connection.prepareStatement(query);
 			}
 			
-			ResultSet resultSet = statement.executeQuery(query);
+			ResultSet resultSet = preparedStatement.executeQuery();
 	
 			while (resultSet.next()){
 				String name = resultSet.getString("NAME");
@@ -199,12 +209,22 @@ public class DBUtil {
 	 */
 	public static boolean isValidUser(String user, String password) throws SQLException{
 		if (user == null || password == null || user.trim().length() == 0 || password.trim().length() == 0)
-			return false; 
+			return false;
 		
 		Connection connection = getConnection();
-		Statement statement = connection.createStatement();
 		
-		ResultSet resultSet =statement.executeQuery("SELECT COUNT(*)FROM PEOPLE WHERE USER_ID = '"+ user +"' AND PASSWORD='" + password + "'");
+		/*
+		 * SECURITY FIX: Using PreparedStatement with parameterized query to prevent SQL injection.
+		 * This is critical for authentication - previously an attacker could bypass login by injecting
+		 * SQL like: ' OR '1'='1' -- which would always return true.
+		 * PreparedStatement ensures user input is treated as literal data, not SQL code.
+		 */
+		String query = "SELECT COUNT(*) FROM PEOPLE WHERE USER_ID = ? AND PASSWORD = ?";
+		PreparedStatement preparedStatement = connection.prepareStatement(query);
+		preparedStatement.setString(1, user);
+		preparedStatement.setString(2, password);
+		
+		ResultSet resultSet = preparedStatement.executeQuery();
 		
 		if (resultSet.next()){
 			
@@ -223,11 +243,18 @@ public class DBUtil {
 	 */
 	public static User getUserInfo(String username) throws SQLException{
 		if (username == null || username.trim().length() == 0)
-			return null; 
+			return null;
 		
 		Connection connection = getConnection();
-		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = '"+ username +"' ");
+		
+		/*
+		 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when retrieving user info.
+		 * Prevents attackers from injecting SQL to access unauthorized user data or escalate privileges.
+		 */
+		String query = "SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = ?";
+		PreparedStatement preparedStatement = connection.prepareStatement(query);
+		preparedStatement.setString(1, username);
+		ResultSet resultSet = preparedStatement.executeQuery();
 
 		String firstName = null;
 		String lastName = null;
@@ -257,17 +284,24 @@ public class DBUtil {
 	 */
 	public static Account[] getAccounts(String username) throws SQLException{
 		if (username == null || username.trim().length() == 0)
-			return null; 
+			return null;
 		
 		Connection connection = getConnection();
-		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_ID, ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE USERID = '"+ username +"' ");
+		
+		/*
+		 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when retrieving accounts.
+		 * Prevents attackers from accessing other users' account information through SQL injection.
+		 */
+		String query = "SELECT ACCOUNT_ID, ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE USERID = ?";
+		PreparedStatement preparedStatement = connection.prepareStatement(query);
+		preparedStatement.setString(1, username);
+		ResultSet resultSet = preparedStatement.executeQuery();
 
 		ArrayList<Account> accounts = new ArrayList<Account>(3);
 		while (resultSet.next()){
 			long accountId = resultSet.getLong("ACCOUNT_ID");
 			String name = resultSet.getString("ACCOUNT_NAME");
-			double balance = resultSet.getDouble("BALANCE"); 
+			double balance = resultSet.getDouble("BALANCE");
 			Account newAccount = new Account(accountId, name, balance);
 			accounts.add(newAccount);
 		}
@@ -290,14 +324,13 @@ public class DBUtil {
 			User user = getUserInfo(username);
 			
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
 
 			Account debitAccount = Account.getAccount(debitActId);
 			Account creditAccount = Account.getAccount(creditActId);
 
 			if (debitAccount == null){
 				return "Originating account is invalid";
-			} 
+			}
 			
 			if (creditAccount == null)
 				return "Destination account is invalid";
@@ -310,34 +343,67 @@ public class DBUtil {
 			long userCC = user.getCreditCardNumber();
 			
 			/* this is the account that the payment will be made from, thus negative amount!*/
-			double debitAmount = -amount; 
+			double debitAmount = -amount;
 			/* this is the account that the payment will be made to, thus positive amount!*/
 			double creditAmount = amount;
 			
-			/* Credit card account balance is the amount owed, not amount owned 
+			/* Credit card account balance is the amount owed, not amount owned
 			 * (reverse of other accounts). Therefore we have to process balances differently*/
 			if (debitAccount.getAccountId() == userCC)
 				debitAmount = -debitAmount;
 		
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection in transaction records.
+			 * Prevents attackers from manipulating transaction data or injecting malicious SQL.
+			 */
+			String debitType = (debitAccount.getAccountId() == userCC) ? "Cash Advance" : "Withdrawal";
+			String creditType = (creditAccount.getAccountId() == userCC) ? "Payment" : "Deposit";
+			
 			//create transaction record
-			statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"',"+((debitAccount.getAccountId() == userCC)?"'Cash Advance'":"'Withdrawal'")+","+debitAmount+")," +
-					  "("+creditAccount.getAccountId()+",'"+date+"',"+((creditAccount.getAccountId() == userCC)?"'Payment'":"'Deposit'")+","+creditAmount+")"); 	
+			String insertTransactionQuery = "INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?, ?, ?, ?), (?, ?, ?, ?)";
+			PreparedStatement transactionStmt = connection.prepareStatement(insertTransactionQuery);
+			transactionStmt.setLong(1, debitAccount.getAccountId());
+			transactionStmt.setTimestamp(2, date);
+			transactionStmt.setString(3, debitType);
+			transactionStmt.setDouble(4, debitAmount);
+			transactionStmt.setLong(5, creditAccount.getAccountId());
+			transactionStmt.setTimestamp(6, date);
+			transactionStmt.setString(7, creditType);
+			transactionStmt.setDouble(8, creditAmount);
+			transactionStmt.execute();
 
 			Log4AltoroJ.getInstance().logTransaction(debitAccount.getAccountId()+" - "+ debitAccount.getAccountName(), creditAccount.getAccountId()+" - "+ creditAccount.getAccountName(), amount);
 			
 			if (creditAccount.getAccountId() == userCC)
 				 creditAmount = -creditAmount;
 			
-			//add cash advance fee since the money transfer was made from the credit card 
+			//add cash advance fee since the money transfer was made from the credit card
 			if (debitAccount.getAccountId() == userCC){
-				statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"','Cash Advance Fee',"+CASH_ADVANCE_FEE+")");
+				String feeQuery = "INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?, ?, 'Cash Advance Fee', ?)";
+				PreparedStatement feeStmt = connection.prepareStatement(feeQuery);
+				feeStmt.setLong(1, debitAccount.getAccountId());
+				feeStmt.setTimestamp(2, date);
+				feeStmt.setDouble(3, CASH_ADVANCE_FEE);
+				feeStmt.execute();
 				debitAmount += CASH_ADVANCE_FEE;
 				Log4AltoroJ.getInstance().logTransaction(String.valueOf(userCC), "N/A", CASH_ADVANCE_FEE);
 			}
 						
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection in balance updates.
+			 * Ensures account balances cannot be manipulated through SQL injection.
+			 */
 			//update account balances
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (debitAccount.getBalance()+debitAmount) + " WHERE ACCOUNT_ID = " + debitAccount.getAccountId());
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (creditAccount.getBalance()+creditAmount) + " WHERE ACCOUNT_ID = " + creditAccount.getAccountId());
+			String updateBalanceQuery = "UPDATE ACCOUNTS SET BALANCE = ? WHERE ACCOUNT_ID = ?";
+			PreparedStatement updateDebitStmt = connection.prepareStatement(updateBalanceQuery);
+			updateDebitStmt.setDouble(1, debitAccount.getBalance() + debitAmount);
+			updateDebitStmt.setLong(2, debitAccount.getAccountId());
+			updateDebitStmt.execute();
+			
+			PreparedStatement updateCreditStmt = connection.prepareStatement(updateBalanceQuery);
+			updateCreditStmt.setDouble(1, creditAccount.getBalance() + creditAmount);
+			updateCreditStmt.setLong(2, creditAccount.getAccountId());
+			updateCreditStmt.execute();
 			
 			return null;
 			
@@ -362,33 +428,58 @@ public class DBUtil {
 
 			Connection connection = getConnection();
 
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection in transaction queries.
+			 * Prevents attackers from injecting SQL through date parameters or manipulating account filters.
+			 * Uses parameterized queries with ? placeholders for all dynamic values.
+			 */
 			
-			Statement statement = connection.createStatement();
+			// Build the account ID filter with placeholders
+			StringBuilder queryBuilder = new StringBuilder("SELECT * FROM TRANSACTIONS WHERE (");
+			for (int i = 0; i < accounts.length; i++) {
+				if (i > 0) {
+					queryBuilder.append(" OR ");
+				}
+				queryBuilder.append("ACCOUNTID = ?");
+			}
+			queryBuilder.append(")");
+			
+			// Add date filters if provided
+			int paramIndex = accounts.length + 1;
+			if (startDate != null && startDate.length() > 0 && endDate != null && endDate.length() > 0) {
+				queryBuilder.append(" AND DATE BETWEEN ? AND ?");
+			} else if (startDate != null && startDate.length() > 0) {
+				queryBuilder.append(" AND DATE > ?");
+			} else if (endDate != null && endDate.length() > 0) {
+				queryBuilder.append(" AND DATE < ?");
+			}
+			
+			queryBuilder.append(" ORDER BY DATE DESC");
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.toString());
 			
 			if (rowCount > 0)
-				statement.setMaxRows(rowCount);
-
-			StringBuffer acctIds = new StringBuffer();
-			acctIds.append("ACCOUNTID = " + accounts[0].getAccountId());
-			for (int i=1; i<accounts.length; i++){
-				acctIds.append(" OR ACCOUNTID = "+accounts[i].getAccountId());	
+				preparedStatement.setMaxRows(rowCount);
+			
+			// Set account ID parameters
+			for (int i = 0; i < accounts.length; i++) {
+				preparedStatement.setLong(i + 1, accounts[i].getAccountId());
 			}
 			
-			String dateString = null;
-			
-			if (startDate != null && startDate.length()>0 && endDate != null && endDate.length()>0){
-				dateString = "DATE BETWEEN '" + startDate + " 00:00:00' AND '" + endDate + " 23:59:59'";
-			} else if (startDate != null && startDate.length()>0){
-				dateString = "DATE > '" + startDate +" 00:00:00'";
-			} else if (endDate != null && endDate.length()>0){
-				dateString = "DATE < '" + endDate + " 23:59:59'";
+			// Set date parameters
+			if (startDate != null && startDate.length() > 0 && endDate != null && endDate.length() > 0) {
+				preparedStatement.setString(paramIndex, startDate + " 00:00:00");
+				preparedStatement.setString(paramIndex + 1, endDate + " 23:59:59");
+			} else if (startDate != null && startDate.length() > 0) {
+				preparedStatement.setString(paramIndex, startDate + " 00:00:00");
+			} else if (endDate != null && endDate.length() > 0) {
+				preparedStatement.setString(paramIndex, endDate + " 23:59:59");
 			}
 			
-			String query = "SELECT * FROM TRANSACTIONS WHERE (" + acctIds.toString() + ") " + ((dateString==null)?"": "AND (" + dateString + ") ") + "ORDER BY DATE DESC" ;
 			ResultSet resultSet = null;
 			
 			try {
-				resultSet = statement.executeQuery(query);
+				resultSet = preparedStatement.executeQuery();
 			} catch (SQLException e){
 				int errorCode = e.getErrorCode();
 				if (errorCode == 30000)
@@ -406,7 +497,7 @@ public class DBUtil {
 				transactions.add(new Transaction(transId, actId, date, desc, amount));
 			}
 			
-			return transactions.toArray(new Transaction[transactions.size()]); 
+			return transactions.toArray(new Transaction[transactions.size()]);
 	}
 
 	public static String[] getBankUsernames() {
@@ -435,13 +526,20 @@ public class DBUtil {
 	public static Account getAccount(long accountNo) throws SQLException {
 
 		Connection connection = getConnection();
-		Statement statement = connection.createStatement();
-		ResultSet resultSet =statement.executeQuery("SELECT ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE ACCOUNT_ID = "+ accountNo +" ");
+		
+		/*
+		 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when retrieving account details.
+		 * Prevents unauthorized access to account information through SQL injection.
+		 */
+		String query = "SELECT ACCOUNT_NAME, BALANCE FROM ACCOUNTS WHERE ACCOUNT_ID = ?";
+		PreparedStatement preparedStatement = connection.prepareStatement(query);
+		preparedStatement.setLong(1, accountNo);
+		ResultSet resultSet = preparedStatement.executeQuery();
 
 		ArrayList<Account> accounts = new ArrayList<Account>(3);
 		while (resultSet.next()){
 			String name = resultSet.getString("ACCOUNT_NAME");
-			double balance = resultSet.getDouble("BALANCE"); 
+			double balance = resultSet.getDouble("BALANCE");
 			Account newAccount = new Account(accountNo, name, balance);
 			accounts.add(newAccount);
 		}
@@ -455,8 +553,16 @@ public class DBUtil {
 	public static String addAccount(String username, String acctType) {
 		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-			statement.execute("INSERT INTO ACCOUNTS (USERID,ACCOUNT_NAME,BALANCE) VALUES ('"+username+"','"+acctType+"', 0)");
+			
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when adding accounts.
+			 * Prevents attackers from injecting malicious SQL through username or account type parameters.
+			 */
+			String query = "INSERT INTO ACCOUNTS (USERID,ACCOUNT_NAME,BALANCE) VALUES (?, ?, 0)";
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, acctType);
+			preparedStatement.execute();
 			return null;
 		} catch (SQLException e){
 			return e.toString();
@@ -466,8 +572,18 @@ public class DBUtil {
 	public static String addSpecialUser(String username, String password, String firstname, String lastname) {
 		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-			statement.execute("INSERT INTO SPECIAL_CUSTOMERS (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES ('"+username+"','"+password+"', '"+firstname+"', '"+lastname+"','user')");
+			
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when adding special users.
+			 * Prevents attackers from injecting SQL through user registration parameters.
+			 */
+			String query = "INSERT INTO SPECIAL_CUSTOMERS (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES (?, ?, ?, ?, 'user')";
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, password);
+			preparedStatement.setString(3, firstname);
+			preparedStatement.setString(4, lastname);
+			preparedStatement.execute();
 			return null;
 		} catch (SQLException e){
 			return e.toString();
@@ -478,8 +594,18 @@ public class DBUtil {
 	public static String addUser(String username, String password, String firstname, String lastname) {
 		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-			statement.execute("INSERT INTO PEOPLE (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES ('"+username+"','"+password+"', '"+firstname+"', '"+lastname+"','user')");
+			
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when adding users.
+			 * Prevents attackers from injecting SQL through user registration parameters.
+			 */
+			String query = "INSERT INTO PEOPLE (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES (?, ?, ?, ?, 'user')";
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, password);
+			preparedStatement.setString(3, firstname);
+			preparedStatement.setString(4, lastname);
+			preparedStatement.execute();
 			return null;
 		} catch (SQLException e){
 			return e.toString();
@@ -490,8 +616,16 @@ public class DBUtil {
 	public static String changePassword(String username, String password) {
 		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-			statement.execute("UPDATE PEOPLE SET PASSWORD = '"+ password +"' WHERE USER_ID = '"+username+"'");
+			
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when changing passwords.
+			 * Prevents attackers from injecting SQL to change other users' passwords or escalate privileges.
+			 */
+			String query = "UPDATE PEOPLE SET PASSWORD = ? WHERE USER_ID = ?";
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setString(1, password);
+			preparedStatement.setString(2, username);
+			preparedStatement.execute();
 			return null;
 		} catch (SQLException e){
 			return e.toString();
@@ -501,11 +635,21 @@ public class DBUtil {
 
 	
 	public static long storeFeedback(String name, String email, String subject, String comments) {
-		try{ 
+		try{
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-			statement.execute("INSERT INTO FEEDBACK (NAME,EMAIL,SUBJECT,COMMENTS) VALUES ('"+name+"', '"+email+"', '"+subject+"', '"+comments+"')", Statement.RETURN_GENERATED_KEYS);
-			ResultSet rs= statement.getGeneratedKeys();
+			
+			/*
+			 * SECURITY FIX: Using PreparedStatement to prevent SQL injection when storing feedback.
+			 * Prevents attackers from injecting malicious SQL through feedback form fields.
+			 */
+			String query = "INSERT INTO FEEDBACK (NAME,EMAIL,SUBJECT,COMMENTS) VALUES (?, ?, ?, ?)";
+			PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			preparedStatement.setString(1, name);
+			preparedStatement.setString(2, email);
+			preparedStatement.setString(3, subject);
+			preparedStatement.setString(4, comments);
+			preparedStatement.execute();
+			ResultSet rs = preparedStatement.getGeneratedKeys();
 			long id = -1;
 			if (rs.next()){
 				id = rs.getLong(1);

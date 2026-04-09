@@ -20,9 +20,12 @@ jobs:
       env:
         BOBSHELL_API_KEY: ${{ secrets.BOBSHELL_API_KEY }}
       run: |
+        exec 3>&1
+        BOB_OUTPUT=$(BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -p "Generate a detailed PR description for @${GITHUB_REF}" | tee /dev/fd/3)
+        exec 3>&-
         {
           echo "BOB_OUTPUT<<EOF"
-          BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob --hide-intermediary-output -p "Generate a detailed PR description for @${GITHUB_REF}"
+          echo "$BOB_OUTPUT" | sed -n '/---output---/,/---output---/p' | sed '1d;$d'
           echo "EOF"
         } >> "$GITHUB_ENV"
     - name: Create PR comment

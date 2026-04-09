@@ -1,10 +1,12 @@
 # This workflow creates a description of changes when a PR is created
 name: Summarise pull request changes
+permissions:
+  pull-requests: write
 on:
   pull_request:
     types: [opened, synchronize]
 jobs:
-  setup:
+  pr-analysis:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -13,9 +15,11 @@ jobs:
       with:
         node-version: '22.x'
     - run: curl -fsSL https://bob.ibm.com/download/bobshell.sh | bash -s -- --pm npm
-    - run: export ENV PATH="/root/.bob/bin:${PATH}" && bob --version
+    - run: export PATH="/root/.bob/bin:${PATH}" && bob --version
     - name: Generate PR description
-      run: echo "BOB_OUTPUT=$(bob -p 'Generate a detail PR description for @$GITHUB_REF')" >> "$GITHUB_ENV"
+      env:
+        BOBSHELL_API_KEY: ${{ secrets.BOBSHELL_API_KEY }}
+      run: echo "BOB_OUTPUT=$(export BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -p 'Generate a detail PR description for @$GITHUB_REF')" >> "$GITHUB_ENV"
     - name: Create PR comment
       id: description
       uses: peter-evans/create-or-update-comment@v5

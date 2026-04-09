@@ -22,7 +22,7 @@ jobs:
       run: |
         {
           echo "BOB_OUTPUT<<EOF"
-          BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -d --hide-intermediary-output -p "Generate a detailed PR description for @${GITHUB_REF}"
+          BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob --hide-intermediary-output -p "Generate a detailed PR description for @${GITHUB_REF}"
           echo "EOF"
         } >> "$GITHUB_ENV"
     - name: Create PR comment

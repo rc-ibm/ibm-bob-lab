@@ -21,11 +21,11 @@ jobs:
         BOBSHELL_API_KEY: ${{ secrets.BOBSHELL_API_KEY }}
       run: |
         exec 3>&1
-        BOB_OUTPUT=$(BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -p "Generate a detailed PR description for @${GITHUB_REF}" | tee /dev/fd/3)
+        BOB_OUTPUT=$(BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -p "Generate a detailed PR description for ${GITHUB_REF}. Source branch is ${GITHUB_HEAD_REF} and target branch is ${GITHUB_BASE_REF}" | tee /dev/fd/3)
         exec 3>&-
         {
           echo "BOB_OUTPUT<<EOF"
-          echo "$BOB_OUTPUT" | sed -n '/---output---/,/---output---/p' | sed '1d;$d'
+          echo "$BOB_OUTPUT" | sed '1d;$d' | awk 'BEGIN{RS="---output---"} END{print}'
           echo "EOF"
         } >> "$GITHUB_ENV"
     - name: Create PR comment

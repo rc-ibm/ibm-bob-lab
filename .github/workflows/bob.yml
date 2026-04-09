@@ -26,10 +26,9 @@ jobs:
           echo "EOF"
         } >> "$GITHUB_ENV"
     - name: Create PR comment
-      id: description
       uses: peter-evans/create-or-update-comment@v5
       with:
         issue-number: ${{ github.event.pull_request.number }}
         body: |
           Bob-generated PR Summary:
-          "${BOB_OUTPUT}"
+          ${{ env.BOB_OUTPUT }}

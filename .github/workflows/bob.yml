@@ -19,7 +19,12 @@ jobs:
     - name: Generate PR description
       env:
         BOBSHELL_API_KEY: ${{ secrets.BOBSHELL_API_KEY }}
-      run: echo "BOB_OUTPUT=$(BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -d --hide-intermediary-output -p "Generate a detailed PR description for @${GITHUB_REF}")" >> "$GITHUB_ENV"
+      run: |
+        {
+          echo "BOB_OUTPUT<<EOF"
+          BOBSHELL_API_KEY=$BOBSHELL_API_KEY && bob -d --hide-intermediary-output -p "Generate a detailed PR description for @${GITHUB_REF}"
+          echo "EOF"
+        } >> "$GITHUB_ENV"
     - name: Create PR comment
       id: description
       uses: peter-evans/create-or-update-comment@v5

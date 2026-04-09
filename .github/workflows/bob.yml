@@ -12,7 +12,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '22.x'
-    - run: curl -fsSL https://bob.ibm.com/download/bobshell.sh | bash
+    - run: curl -fsSL https://bob.ibm.com/download/bobshell.sh | bash -s -- --pm npm
     - run: export ENV PATH="/root/.bob/bin:${PATH}" && bob --version
     - name: Generate PR description
       run: echo "BOB_OUTPUT=$(bob -p 'Generate a detail PR description for @$GITHUB_REF')" >> "$GITHUB_ENV"

@@ -78,8 +78,10 @@ customModes:
       Use this structure unless the user has a template:
 
       ```
+      # Bob-generated PR Summary: <PR Title>
+
       ## Summary
-      <!-- 2–4 sentences: what the story asked for and what this PR delivers -->
+      <!-- 2-4 sentences: what the story asked for and what this PR delivers -->
 
       ## Story vs Implementation
       - ✅ Fully implemented: [list what's done]

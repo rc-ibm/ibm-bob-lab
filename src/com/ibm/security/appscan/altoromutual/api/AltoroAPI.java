@@ -1,7 +1,7 @@
 package com.ibm.security.appscan.altoromutual.api;
 
 
-import javax.ws.rs.ApplicationPath;
+import jakarta.ws.rs.ApplicationPath;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.ibm.security.appscan.altoromutual.filter.ApiAuthFilter;
